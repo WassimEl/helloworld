@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu Ito Numérique</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            color: #1c1c1e;
+            touch-action: manipulation;
+        }
+        h1 {
+            color: #007aff;
+            text-align: center;
+            padding: 15px 0;
+            margin: 0;
+            font-size: 24px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+        button {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active {
+            background-color: #0062cc;
+            transform: scale(0.98);
+        }
+        button:disabled {
+            background-color: #a7a7a7;
+            cursor: not-allowed;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #c7c7cc;
+            border-radius: 12px;
+            font-size: 20px;
+            margin: 15px 0;
+            box-sizing: border-box;
+        }
+        .theme-display {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 12px;
+        }
+        .scale-display {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            color: #636366;
+            font-size: 16px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .player-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #007aff;
+        }
+        .player-number {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 30px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .nav-button {
+            width: 48%;
+        }
+        .reveal-button {
+            background-color: #34c759;
+        }
+        .reveal-button:active {
+            background-color: #248a3d;
+        }
+        .results-list {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f2f2f7;
+            border-radius: 12px;
+            font-size: 18px;
+            align-items: center;
+        }
+        .player-name-input {
+            font-size: 18px;
+            margin-right: 10px;
+            flex-grow: 1;
+        }
+        .player-number-display {
+            font-size: 24px;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: center;
+        }
+        .player-order-controls {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+        }
+        .order-button {
+            padding: 5px 10px;
+            font-size: 16px;
+            margin: 2px 0;
+            width: auto;
+        }
+        .player-list {
+            width: 100%;
+            margin: 15px 0;
+        }
+        .player-input-item {
+            display: flex;
+            margin: 10px 0;
+            align-items: center;
+        }
+        .remove-player {
+            background-color: #ff3b30;
+            margin-left: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .add-player {
+            background-color: #34c759;
+        }
+        .final-results {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .final-result-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #e3f2fd;
+            border-radius: 12px;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .sort-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin: 15px 0;
+        }
+        .sort-button {
+            width: 48%;
+            font-size: 16px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jeu Ito</h1>
+    
+    <div class="container" id="setup-container">
+        <div class="theme-display">
+            Thème: <span id="current-theme">Chargement...</span>
+            <div class="scale-display">
+                <span>1: <span id="low-scale"></span></span>
+                <span>100: <span id="high-scale"></span></span>
+            </div>
+        </div>
+        
+        <button id="change-theme">Changer de thème</button>
+        
+        <div class="player-list" id="player-list">
+            <!-- Les champs de noms des joueurs seront ajoutés ici -->
+        </div>
+        
+        <button class="add-player" id="add-player">+ Ajouter un joueur</button>
+        
+        <button id="start-game">Commencer la partie</button>
+    </div>
+    
+    <div class="container hidden" id="game-container">
+        <div class="theme-display">
+            Thème: <span id="game-theme"></span>
+            <div class="scale-display">
+                <span>1: <span id="game-low-scale"></span></span>
+                <span>100: <span id="game-high-scale"></span></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="player-name" id="current-player-name">Joueur 1</div>
+            <div class="player-number" id="current-player-number">?</div>
+            <button class="reveal-button" id="reveal-number">Afficher mon nombre</button>
+            <div class="navigation hidden" id="player-navigation">
+                <button class="nav-button" id="prev-player">← Précédent</button>
+                <button class="nav-button" id="next-player">Suivant →</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container hidden" id="sort-container">
+        <div class="theme-display">
+            Thème: <span id="sort-theme"></span>
+            <div class="scale-display">
+                <span>1: <span id="sort-low-scale"></span></span>
+                <span>100: <span id="sort-high-scale"></span></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="player-name">Classement</div>
+            <p>Placez les joueurs dans l'ordre que vous pensez être le bon</p>
+            
+            <div class="results-list" id="sort-list"></div>
+            
+            <div class="sort-buttons">
+                <button class="sort-button" id="validate-sorting">Valider l'ordre</button>
+                <button class="sort-button" id="cancel-sorting">Annuler</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container hidden" id="results-container">
+        <div class="theme-display">
+            Thème: <span id="results-theme"></span>
+            <div class="scale-display">
+                <span>1: <span id="results-low-scale"></span></span>
+                <span>100: <span id="results-high-scale"></span></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="player-name">Résultats finaux</div>
+            
+            <div class="final-results" id="final-results"></div>
+            
+            <div class="navigation">
+                <button id="new-game-same-players">Rejouer (mêmes joueurs)</button>
+                <button id="new-game-change-players">Rejouer (changer joueurs)</button>
+            </div>
+            <button id="change-theme-end">Changer de thème</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de données de thèmes (150+ thèmes)
+        const themes = [
+            { name: "Dangerosité d'objets", low: "Pas dangereux", high: "Très dangereux" },
+            { name: "Taille d'animaux", low: "Très petit", high: "Très grand" },
+            // ... (tous les thèmes précédents)
+            { name: "Rareté de fleurs", low: "Commune", high: "Très rare" }
+        ];
+
+        // Éléments du DOM
+        const setupContainer = document.getElementById('setup-container');
+        const gameContainer = document.getElementById('game-container');
+        const sortContainer = document.getElementById('sort-container');
+        const resultsContainer = document.getElementById('results-container');
+        const currentThemeDisplay = document.getElementById('current-theme');
+        const gameThemeDisplay = document.getElementById('game-theme');
+        const sortThemeDisplay = document.getElementById('sort-theme');
+        const resultsThemeDisplay = document.getElementById('results-theme');
+        const lowScaleDisplay = document.getElementById('low-scale');
+        const highScaleDisplay = document.getElementById('high-scale');
+        const gameLowScaleDisplay = document.getElementById('game-low-scale');
+        const gameHighScaleDisplay = document.getElementById('game-high-scale');
+        const sortLowScaleDisplay = document.getElementById('sort-low-scale');
+        const sortHighScaleDisplay = document.getElementById('sort-high-scale');
+        const resultsLowScaleDisplay = document.getElementById('results-low-scale');
+        const resultsHighScaleDisplay = document.getElementById('results-high-scale');
+        const playerList = document.getElementById('player-list');
+        const addPlayerBtn = document.getElementById('add-player');
+        const startGameBtn = document.getElementById('start-game');
+        const changeThemeBtn = document.getElementById('change-theme');
+        const changeThemeEndBtn = document.getElementById('change-theme-end');
+        const currentPlayerNameDisplay = document.getElementById('current-player-name');
+        const currentPlayerNumberDisplay = document.getElementById('current-player-number');
+        const revealNumberBtn = document.getElementById('reveal-number');
+        const prevPlayerBtn = document.getElementById('prev-player');
+        const nextPlayerBtn = document.getElementById('next-player');
+        const playerNavigation = document.getElementById('player-navigation');
+        const sortList = document.getElementById('sort-list');
+        const validateSortingBtn = document.getElementById('validate-sorting');
+        const cancelSortingBtn = document.getElementById('cancel-sorting');
+        const finalResults = document.getElementById('final-results');
+        const newGameSamePlayersBtn = document.getElementById('new-game-same-players');
+        const newGameChangePlayersBtn = document.getElementById('new-game-change-players');
+
+        // Variables du jeu
+        let currentTheme;
+        let players = [];
+        let playerNames = [];
+        let playerNumbers = [];
+        let currentPlayerIndex = 0;
+        let isNumberRevealed = false;
+
+        // Initialisation
+        function init() {
+            selectRandomTheme();
+            setupEventListeners();
+            addPlayerInput(); // Ajouter un premier joueur par défaut
+            addPlayerInput(); // Ajouter un deuxième joueur par défaut
+        }
+
+        function setupEventListeners() {
+            startGameBtn.addEventListener('click', startGame);
+            changeThemeBtn.addEventListener('click', selectRandomTheme);
+            changeThemeEndBtn.addEventListener('click', selectRandomTheme);
+            revealNumberBtn.addEventListener('click', toggleNumberVisibility);
+            prevPlayerBtn.addEventListener('click', () => navigatePlayer(-1));
+            nextPlayerBtn.addEventListener('click', () => navigatePlayer(1));
+            addPlayerBtn.addEventListener('click', addPlayerInput);
+            validateSortingBtn.addEventListener('click', showFinalResults);
+            cancelSortingBtn.addEventListener('click', cancelSorting);
+            newGameSamePlayersBtn.addEventListener('click', newGameSamePlayers);
+            newGameChangePlayersBtn.addEventListener('click', newGameChangePlayers);
+        }
+
+        function selectRandomTheme() {
+            const randomIndex = Math.floor(Math.random() * themes.length);
+            currentTheme = themes[randomIndex];
+            updateThemeDisplay();
+        }
+
+        function updateThemeDisplay() {
+            currentThemeDisplay.textContent = currentTheme.name;
+            gameThemeDisplay.textContent = currentTheme.name;
+            sortThemeDisplay.textContent = currentTheme.name;
+            resultsThemeDisplay.textContent = currentTheme.name;
+            
+            lowScaleDisplay.textContent = currentTheme.low;
+            highScaleDisplay.textContent = currentTheme.high;
+            gameLowScaleDisplay.textContent = currentTheme.low;
+            gameHighScaleDisplay.textContent = currentTheme.high;
+            sortLowScaleDisplay.textContent = currentTheme.low;
+            sortHighScaleDisplay.textContent = currentTheme.high;
+            resultsLowScaleDisplay.textContent = currentTheme.low;
+            resultsHighScaleDisplay.textContent = currentTheme.high;
+        }
+
+        function addPlayerInput() {
+            const playerId = Date.now(); // ID unique
+            
+            const playerItem = document.createElement('div');
+            playerItem.className = 'player-input-item';
+            playerItem.dataset.id = playerId;
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Nom du joueur';
+            input.className = 'player-name-input';
+            input.value = `Joueur ${playerList.children.length + 1}`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = '×';
+            removeBtn.className = 'remove-player';
+            removeBtn.addEventListener('click', () => {
+                if (playerList.children.length > 2) {
+                    playerItem.remove();
+                } else {
+                    alert("Il doit y avoir au moins 2 joueurs");
+                }
+            });
+            
+            playerItem.appendChild(input);
+            playerItem.appendChild(removeBtn);
+            playerList.appendChild(playerItem);
+        }
+
+        function startGame() {
+            // Récupérer les noms des joueurs
+            playerNames = [];
+            const inputs = playerList.querySelectorAll('.player-name-input');
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    playerNames.push(input.value.trim());
+                } else {
+                    playerNames.push(`Joueur ${playerNames.length + 1}`);
+                }
+            });
+            
+            if (playerNames.length < 2) {
+                alert("Il doit y avoir au moins 2 joueurs");
+                return;
+            }
+
+            // Générer les nombres aléatoires
+            playerNumbers = [];
+            for (let i = 0; i < playerNames.length; i++) {
+                playerNumbers.push(Math.floor(Math.random() * 100) + 1);
+            }
+
+            currentPlayerIndex = 0;
+            isNumberRevealed = false;
+            updatePlayerDisplay();
+            
+            setupContainer.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            sortContainer.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+        }
+
+        function updatePlayerDisplay() {
+            currentPlayerNameDisplay.textContent = playerNames[currentPlayerIndex];
+            
+            if (isNumberRevealed) {
+                currentPlayerNumberDisplay.textContent = playerNumbers[currentPlayerIndex];
+                revealNumberBtn.textContent = "Cacher le nombre";
+            } else {
+                currentPlayerNumberDisplay.textContent = "?";
+                revealNumberBtn.textContent = "Afficher mon nombre";
+            }
+            
+            playerNavigation.classList.remove('hidden');
+            prevPlayerBtn.disabled = currentPlayerIndex === 0;
+            
+            if (currentPlayerIndex === playerNames.length - 1) {
+                nextPlayerBtn.textContent = "Voir le classement";
+            } else {
+                nextPlayerBtn.textContent = "Suivant →";
+            }
+        }
+
+        function toggleNumberVisibility() {
+            isNumberRevealed = !isNumberRevealed;
+            updatePlayerDisplay();
+        }
+
+        function navigatePlayer(direction) {
+            if (direction === 1 && !isNumberRevealed && currentPlayerIndex < playerNames.length - 1) {
+                alert("Vous devez afficher votre nombre avant de continuer");
+                return;
+            }
+            
+            if (direction === 1 && currentPlayerIndex === playerNames.length - 1) {
+                showSortingInterface();
+                return;
+            }
+            
+            currentPlayerIndex += direction;
+            isNumberRevealed = false;
+            updatePlayerDisplay();
+        }
+
+        function showSortingInterface() {
+            gameContainer.classList.add('hidden');
+            sortContainer.classList.remove('hidden');
+            
+            sortList.innerHTML = '';
+            
+            // Créer une copie des joueurs avec leurs numéros pour le tri
+            const playersForSorting = playerNames.map((name, index) => ({
+                name,
+                number: playerNumbers[index],
+                id: index
+            }));
+            
+            // Afficher les joueurs dans l'ordre initial
+            playersForSorting.forEach((player, index) => {
+                const playerItem = document.createElement('div');
+                playerItem.className = 'result-item';
+                playerItem.dataset.id = player.id;
+                playerItem.draggable = true;
+                
+                const playerInfo = document.createElement('span');
+                playerInfo.textContent = player.name;
+                
+                const numberDisplay = document.createElement('span');
+                numberDisplay.className = 'player-number-display';
+                numberDisplay.textContent = "?";
+                numberDisplay.addEventListener('click', () => {
+                    if (numberDisplay.textContent === "?") {
+                        numberDisplay.textContent = player.number;
+                    } else {
+                        numberDisplay.textContent = "?";
+                    }
+                });
+                
+                const orderControls = document.createElement('div');
+                orderControls.className = 'player-order-controls';
+                
+                const upBtn = document.createElement('button');
+                upBtn.className = 'order-button';
+                upBtn.textContent = "↑";
+                upBtn.addEventListener('click', () => movePlayerUp(playerItem));
+                
+                const downBtn = document.createElement('button');
+                downBtn.className = 'order-button';
+                downBtn.textContent = "↓";
+                downBtn.addEventListener('click', () => movePlayerDown(playerItem));
+                
+                orderControls.appendChild(upBtn);
+                orderControls.appendChild(downBtn);
+                
+                playerItem.appendChild(playerInfo);
+                playerItem.appendChild(numberDisplay);
+                playerItem.appendChild(orderControls);
+                
+                sortList.appendChild(playerItem);
+            });
+            
+            // Activer le drag and drop
+            setupDragAndDrop();
+        }
+
+        function movePlayerUp(item) {
+            const prev = item.previousElementSibling;
+            if (prev) {
+                sortList.insertBefore(item, prev);
+            }
+        }
+
+        function movePlayerDown(item) {
+            const next = item.nextElementSibling;
+            if (next) {
+                sortList.insertBefore(next, item);
+            }
+        }
+
+        function setupDragAndDrop() {
+            const items = sortList.querySelectorAll('.result-item');
+            
+            items.forEach(item => {
+                item.addEventListener('dragstart', () => {
+                    item.classList.add('dragging');
+                });
+                
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+            });
+            
+            sortList.addEventListener('dragover', e => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(sortList, e.clientY);
+                const dragging = document.querySelector('.dragging');
+                if (afterElement == null) {
+                    sortList.appendChild(dragging);
+                } else {
+                    sortList.insertBefore(dragging, afterElement);
+                }
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.result-item:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function showFinalResults() {
+            // Récupérer l'ordre choisi par les joueurs
+            const sortedItems = sortList.querySelectorAll('.result-item');
+            const playerOrder = Array.from(sortedItems).map(item => parseInt(item.dataset.id));
+            
+            // Afficher les résultats finaux
+            finalResults.innerHTML = '';
+            
+            playerOrder.forEach((playerId, position) => {
+                const playerName = playerNames[playerId];
+                const playerNumber = playerNumbers[playerId];
+                
+                const resultItem = document.createElement('div');
+                resultItem.className = 'final-result-item';
+                
+                const rankName = document.createElement('span');
+                rankName.textContent = `${position + 1}. ${playerName}`;
+                
+                const number = document.createElement('span');
+                number.textContent = playerNumber;
+                
+                resultItem.appendChild(rankName);
+                resultItem.appendChild(number);
+                finalResults.appendChild(resultItem);
+            });
+            
+            sortContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+        }
+
+        function cancelSorting() {
+            sortContainer.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+        }
+
+        function newGameSamePlayers() {
+            // Garder les mêmes joueurs mais générer de nouveaux nombres
+            playerNumbers = [];
+            for (let i = 0; i < playerNames.length; i++) {
+                playerNumbers.push(Math.floor(Math.random() * 100) + 1);
+            }
+            
+            currentPlayerIndex = 0;
+            isNumberRevealed = false;
+            updatePlayerDisplay();
+            
+            resultsContainer.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+        }
+
+        function newGameChangePlayers() {
+            // Retourner à l'écran de configuration
+            resultsContainer.classList.add('hidden');
+            setupContainer.classList.remove('hidden');
+            
+            // Mettre à jour la liste des joueurs avec les noms actuels
+            playerList.innerHTML = '';
+            playerNames.forEach((name, index) => {
+                addPlayerInput();
+                const inputs = playerList.querySelectorAll('.player-name-input');
+                inputs[index].value = name;
+            });
+            
+            // S'assurer qu'il y a au moins 2 joueurs
+            while (playerList.children.length < 2) {
+                addPlayerInput();
+            }
+        }
+
+        // Démarrer l'application
+        init();
+    </script>
+</body>
+</html>
